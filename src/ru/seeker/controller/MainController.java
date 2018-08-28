@@ -4,11 +4,13 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -16,12 +18,12 @@ import javafx.util.Callback;
 import ru.seeker.service.MainService;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
 
 public class MainController {
 
     private static File directory;
+
+    private File chooseDirectory;
 
     @FXML
     private VBox mainWindow;
@@ -72,7 +74,10 @@ public class MainController {
 
     public void openDirectory(ActionEvent actionEvent) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directory = directoryChooser.showDialog(mainWindow.getScene().getWindow());
+        chooseDirectory = directoryChooser.showDialog(mainWindow.getScene().getWindow());
+        if (chooseDirectory != null) {
+            directory = chooseDirectory;
+        }
         if (directory != null) {
             selectedDirectory.setText("Chosen directory is " + directory.toString());
             btnSearch.setDisable(false);
@@ -122,8 +127,6 @@ public class MainController {
             Tab tab = new Tab();
             tab.setText(treeView.getSelectionModel().getSelectedItem().getValue().getName());
             tab.setClosable(true);
-            TextArea textArea = new TextArea();
-            textArea.setEditable(false);
             StringBuffer buffer = new StringBuffer();
 
             try {
@@ -135,10 +138,13 @@ public class MainController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            textArea.setText(buffer.toString());
+            TextFlow textFlow = service.colorTextFlow(buffer, searchField);
+            textFlow.setPadding(new Insets(10));
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setContent(textFlow);
             tabPane.getTabs().add(tab);
             tabPane.getSelectionModel().select(tab);
-            tab.setContent(textArea);
+            tab.setContent(scrollPane);
         }
     }
 

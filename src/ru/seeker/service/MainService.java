@@ -2,8 +2,13 @@ package ru.seeker.service;
 
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainService {
 
@@ -59,6 +64,35 @@ public class MainService {
                 return true;
             }
             return false;
+        }
+    }
+
+    public TextFlow colorTextFlow(StringBuffer buffer, String search) {
+        if (search != null) {
+            TextFlow result = new TextFlow();
+            ArrayList<Text> allText = new ArrayList<Text>();
+            Pattern pattern = Pattern.compile(search);
+            Matcher matcher = pattern.matcher(buffer.toString());
+            int start = 0;
+            int end = 0;
+            while (matcher.find()) {
+                end = matcher.start();
+                Text textBefore = new Text(buffer.substring(start, end));
+                Text foundText = new Text(buffer.substring(end, matcher.end()));
+                foundText.setStyle("-fx-underline: true; -fx-fill: #c3d315; -fx-font-weight: bold");
+                start = matcher.end();
+                allText.add(textBefore);
+                allText.add(foundText);
+            }
+            allText.add(new Text(buffer.substring(start)));
+            for (Text text : allText) {
+                result.getChildren().add(text);
+            }
+            return result;
+        } else {
+            TextFlow result = new TextFlow();
+            result.getChildren().add(new Text(buffer.toString()));
+            return result;
         }
     }
 
