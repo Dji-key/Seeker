@@ -4,17 +4,16 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import ru.seeker.service.ColoredText;
 import ru.seeker.service.MainService;
 
 import java.io.*;
@@ -127,24 +126,12 @@ public class MainController {
             Tab tab = new Tab();
             tab.setText(treeView.getSelectionModel().getSelectedItem().getValue().getName());
             tab.setClosable(true);
-            StringBuffer buffer = new StringBuffer();
 
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(treeView.getSelectionModel().getSelectedItem().getValue().getAbsoluteFile())));
-                while (reader.ready()) {
-                    buffer.append(reader.readLine() + "\n");
-                }
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            TextFlow textFlow = service.colorTextFlow(buffer, searchField);
-            textFlow.setPadding(new Insets(10));
-            ScrollPane scrollPane = new ScrollPane();
-            scrollPane.setContent(textFlow);
+            ListView<ColoredText> listView = service.colorListView(treeView.getSelectionModel().getSelectedItem().getValue().getAbsoluteFile(), searchField);
+
             tabPane.getTabs().add(tab);
             tabPane.getSelectionModel().select(tab);
-            tab.setContent(scrollPane);
+            tab.setContent(listView);
         }
     }
 
@@ -157,5 +144,11 @@ public class MainController {
         stage.setResizable(false);
         stage.setScene(new Scene(root));
         stage.show();
+    }
+
+    public void btnNext(ActionEvent actionEvent) {
+    }
+
+    public void btnPrev(ActionEvent actionEvent) {
     }
 }
